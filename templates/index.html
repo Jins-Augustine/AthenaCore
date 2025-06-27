@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Threat Intelligence Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="header mb-5">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-shield-alt me-3"></i>
+                <div>
+                    <h1 class="m-0">AthenaCore</h1>
+                    <small class="text-muted" style="font-size: 1rem;">Cyber Threat Intelligence Dashboard</small>
+                </div>
+            </div>
+            <div class="divider"></div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="m-0">IP Threat Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="ipForm" class="mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-9">
+                                    <label for="ipAddress" class="form-label">Enter IP Address</label>
+                                    <input type="text" class="form-control" id="ipAddress" placeholder="e.g., 138.199.21.212" required>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search me-2"></i>Analyze
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div id="results" class="card border-0 bg-light mb-4" style="display: none;">
+                            <div class="card-header bg-light">
+                                <h6 class="m-0">Threat Analysis Results</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-borderless m-0">
+                                        <tbody id="resultsContent">
+                                            <!-- Results will be inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" id="historySection">
+                            <div class="card-header">
+                                <h5 class="m-0">Search History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <button id="exportBtn" class="btn btn-outline-secondary">
+                                        <i class="fas fa-download me-2"></i>Export History
+                                    </button>
+                                    <div class="d-flex">
+                                        <input type="text" class="form-control me-2" placeholder="Search history" id="searchHistory">
+                                        <button class="btn btn-outline-secondary" id="filterBtn">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>IP Address</th>
+                                                <th>Date/Time</th>
+                                                <th>Status</th>
+                                                <th>Confidence</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="historyTable">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="m-0">Threat Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="statsChart" height="250"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="m-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-danger" id="blockIpBtn" disabled>
+                                <i class="fas fa-ban me-2"></i>Block Current IP
+                            </button>
+                            <button class="btn btn-outline-warning" id="reportAbuseBtn" disabled>
+                                <i class="fas fa-flag me-2"></i>Report Abuse
+                            </button>
+                            <button class="btn btn-outline-primary" id="viewHistoryBtn">
+                                <i class="fas fa-history me-2"></i>View Full History
+                            </button>
+                            
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Block IP and Report Abuse are available after analyzing an IP address.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="m-0">System Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>API Connection</span>
+                            <span class="text-success">
+                                <i class="fas fa-check-circle me-1"></i>Active
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Threat Database</span>
+                            <span class="text-success">
+                                <i class="fas fa-check-circle me-1"></i>Updated
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Last Scan</span>
+                            <span id="lastScanTime">Just now</span>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                System status shows the health of your threat intelligence system.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
